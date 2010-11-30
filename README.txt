@@ -1,29 +1,21 @@
+
+Req 0.1
+
+РљР»Р°СЃСЃ РґР»СЏ HTTP-Р·Р°РїСЂРѕСЃРѕРІ С‡РµСЂРµР· РѕР±С‹С‡РЅС‹Р№ socket.
+
+РРґРµСЏ:
+	РєР»Р°СЃСЃ РЅСѓР¶РµРЅ РґР»СЏ РІС‹РїРѕР»РЅРµРЅРёСЏ СЃРµСЂРёР№ Р·Р°РїСЂРѕСЃРѕРІ, РєРѕРіРґР° РЅСѓР¶РЅРѕ СЃРѕС…СЂР°РЅСЏС‚СЊ РјРµР¶РґСѓ РЅРёРјРё cookies (Р°РІС‚РѕСЂРёР·РѕРІС‹РІР°С‚СЊСЃСЏ) Рё РІС‹РїРѕР»РЅСЏС‚СЊ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРёРµ СЂРµРґРёСЂРµРєС‚С‹.
+
+Р‘Р°Р·РѕРІС‹Р№ РїСЂРёРјРµСЂ:
+
 $req = new Req();
-$req->set(array("method"=>"GET","host"=>"obzor.lt","url"=>"/"))->do()
-	->saveContent($content)
-	->save($all)
-	->saveHeader($header)
-	->set("method","POST")->set("url","/profile/signin/")->do(array("email"=>$formData[email],"password"=>$formData["password"]))
-	->saveCookies($cookies)
-	->b()
-		->set("method","GET")
-		->set("Accept-Language","en")
-		->set("autoredirects",true)
-		->set("autoupdatecookies",true)
-		->do()
-		->save($all)
-	->e()            	
-	->set("cookies",$_COOKIE)
-	->add("cookies",array("SID",$SID))
-	->add("cookies","SID",$SID)
-	->add(array("cookies"=>array("SID"=>$SID)))
-	->add(array("cookies"=>"SID",$SID))
+$req	->set(array("method"=>"POST","host"=>"obzor.lt","url"=>"/profile/signin/"))
+	->req(array("username"=>$username,"password"=>$password))
+	->set(array("method"=>"GET","url"=>"/profile/"))
+	->req()
+	->get("cookies",$cookies)
+	->save($content);
 
-->set("cookies","SID",$SID) - добавляет (или переписывает) куку SID, другие cookies не трогает
-->set("cookies",array("SID",$SID)) - переписывает все куки
-->add("cookies",array("SID",$SID)) - добавляет в куки
+- РћС‚РїСЂР°РІР»СЏРµС‚ POST-Р·Р°РїСЂРѕСЃ РЅР° /profile/signin/, СЃРѕС…СЂР°РЅСЏРµС‚ РєСѓРєРё Рё СЃ РЅРёРјРё РґРµР»Р°РµС‚ GET-Р·Р°РїСЂРѕСЃ РЅР° СЃС‚СЂР°РЅРёС†Сѓ /profile/.
+РџРѕС‚РѕРј СЃРѕС…СЂР°РЅСЏРµС‚ РєСѓРєРё РІ $cookies Рё РѕС‚РІРµС‚ РѕС‚ РїРѕСЃР»РµРґРЅРµРіРѕ Р·Р°РїСЂРѕСЃР° РІ $content.
 
-$req->do("")
-
-
-add метода нет, есть только set метод, который действует как add. + есть clear-метод если нужно что-то обнулить.
