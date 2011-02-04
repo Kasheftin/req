@@ -3,6 +3,8 @@
 /* 
 	Req class by Kasheftin
 
+		v. 0.15 (2011.02.04)
+			- Redirect in meta is also supported.
 		v. 0.14 (2010.11.26)
 			- New method get added for getting opts parameters (cookies is the most important).
 		v. 0.13 (2010.11.26)
@@ -297,9 +299,9 @@ class Req
 		if (preg_match("/^HTTP\/\d+\.\d+\s+(301|302)/i",$header) && preg_match("/Location:(.*)[\r\n]/",$header,$m))
 		{
 			$m[1] = trim($m[1]);
-			if (preg_match("/^http(\s)?:\/\//",$m[1]))
+			if (preg_match("/^http(s)?:\/\//",$m[1]))
 			{
-				list($host,$url) = explode("/",preg_replace("/^http:\/\//","",$m[1]),2);
+				list($host,$url) = explode("/",preg_replace("/^http(s)?:\/\//","",$m[1]),2);
 				$url = "/" . $url;
 				
 				$opts["host"] = $host;
@@ -310,6 +312,23 @@ class Req
 				$opts["url"] = $m[1];
 			}
 			$opts["protocol"] = "GET";
+		}
+		elseif (preg_match("/<meta[^<>]*http-equiv=[\"']?Refresh[\"']?[^<>]*>/",$data,$m))
+		{
+			if (preg_match("/url=([^<>\"']*)/",$m[0],$mm))
+			{
+				if (preg_match("/^http(s)?:\/\//",$mm[1]))
+				{
+					list($host,$url) = explode("/",preg_replace("/^http(s)?:\/\//","",$mm[1]),2);
+					$url = "/" . $url;
+					$opts["host"] = $host;
+					$opts["url"] = $url;
+				}
+				else
+				{
+					$opts["url"] = $mm[1];
+				}
+			}
 		}
 		return $opts;
 	}
