@@ -151,7 +151,7 @@ class Req
 			}
 			else
 			{
-				echo trim($r);
+				echo "\n\n" . trim($r) . "\n";
 			}
 		}
 
@@ -179,7 +179,9 @@ class Req
 
 		if ($opts["auto_updatecookies"])
 		{
-			$this->set("cookies",$this->parseCookies($s));
+			$tmp_cookies = $this->parseCookies($s);
+			if ($tmp_cookies)
+				$this->set("cookies",$tmp_cookies);
 		}
 
 		if ($opts["auto_redirects"])
