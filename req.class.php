@@ -55,7 +55,7 @@ class Req
 	{
 		$args = func_get_args();
 
-		if (class_exists("DEBUG"))
+		if (class_exists("DEBUG") && $this->opts[debug])
 		{
 			DEBUG::log($args,__METHOD__);
 		}
