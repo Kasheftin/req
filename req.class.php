@@ -38,6 +38,7 @@ class Req
 		"auto_updatecookies" => true,
 		"auto_redirects" => true,
 		"auto_redirects_limit" => 5,
+		"auto_encode_to" => false,
 		"delay" => 0,
 	);
 
@@ -160,7 +161,7 @@ class Req
 			if (class_exists("DEBUG"))
 				DEBUG::log("Sleeping for a " . ($opts["delay"]==1?"second":$opts["delay"] . " seconds") . " before requesting",__METHOD__);
 			else
-				echo "Sleeping for a " . ($opts["delay"]==1?"second":$opts["delay"] . " seconds") . "before requesting\n\n";
+				echo "Sleeping for a " . ($opts["delay"]==1?"second":$opts["delay"] . " seconds") . " before requesting\n\n";
 
 			sleep($opts["delay"]);
 		}
@@ -204,14 +205,21 @@ class Req
 
 	public function save(&$var)
 	{
+		$opts = end($this->opts);
 		$s = $this->read_chunks(end($this->results[count($this->opts)-1]));
+		if ($opts["auto_encode_to"])
+		{
+			$page_encoding = $this->findEncoding($s);
+			if ($page_encoding && $page_encoding != $opts["auto_encode_to"])
+				$s = iconv($page_encoding,$opts["auto_encode_to"],$s);
+		}
 		$var = $s;
 		return $this;
 	}
 
 	public function saveContent(&$var)
 	{
-		$s = $this->read_chunks(end($this->results[count($this->opts)-1]));
+		$this->save($s);
 		list($header,$data) = explode("\r\n\r\n",$s,2);
 		$var = $data;
 		return $this;
@@ -219,7 +227,7 @@ class Req
 
 	public function saveHeader(&$var)
 	{
-		$s = end($this->results[count($this->opts)-1]);
+		$this->save($s);
 		list($header,$data) = explode("\r\n\r\n",$s,2);
 		$var = $header;
 		return $this;
@@ -292,6 +300,14 @@ class Req
 			$cookies[$ar[0]] = $ar[1];
 		}
 		return $cookies;
+	}
+
+	protected function findEncoding($s)
+	{
+		list($header,$data) = explode("\r\n\r\n",$s,2);
+		if (preg_match("/charset\s*=(\S+)/",$header,$m))
+			return $m[1];
+		return null;
 	}
 
 	protected function findRedirect($s)
