@@ -34,6 +34,7 @@ class Req
 		"connection" => "close",
 		"content-type" => "application/x-www-form-urlencoded",
 		"port" => "80",
+		"x-requested-with" => false,
 		"debug" => false,
 		"auto_updatecookies" => true,
 		"auto_redirects" => true,
@@ -136,6 +137,7 @@ class Req
 			"user-agent" => "User-Agent",
 			"content-type" => "Content-Type",
 			"content-length" => "Content-Length",
+			"x-requested-with" => "X-Requested-With",
 		);
 
 		$r = $opts["protocol"] . " " . $opts["url"] . " HTTP/1.1\r\n" . "Host: " . $opts["host"] . "\r\n";
@@ -159,9 +161,9 @@ class Req
 		if ($opts["delay"])
 		{
 			if (class_exists("DEBUG"))
-				DEBUG::log("Sleeping for a " . ($opts["delay"]==1?"second":$opts["delay"] . " seconds") . " before requesting",__METHOD__);
+				DEBUG::log("Sleeping for a " . ($opts["delay"]==1?"second":$opts["delay"] . " seconds") . " before sending request",__METHOD__);
 			else
-				echo "Sleeping for a " . ($opts["delay"]==1?"second":$opts["delay"] . " seconds") . " before requesting\n\n";
+				echo "Sleeping for a " . ($opts["delay"]==1?"second":$opts["delay"] . " seconds") . " before sending request\n";
 
 			sleep($opts["delay"]);
 		}
