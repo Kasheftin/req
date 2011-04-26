@@ -316,7 +316,7 @@ class Req
 	{
 		$opts = array();
 		list($header,$data) = explode("\r\n\r\n",$s,2);
-		if (preg_match("/^HTTP\/\d+\.\d+\s+(301|302)/i",$header) && preg_match("/Location:(.*)[\r\n]/",$header,$m))
+		if (preg_match("/^HTTP\/\d+\.\d+\s+(301|302)/i",$header) && preg_match("/Location:\s*([^\n]+)/",$header,$m))
 		{
 			$m[1] = trim($m[1]);
 			if (preg_match("/^http(s)?:\/\//",$m[1]))
