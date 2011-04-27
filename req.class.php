@@ -309,6 +309,8 @@ class Req
 		list($header,$data) = explode("\r\n\r\n",$s,2);
 		if (preg_match("/charset\s*=(\S+)/",$header,$m))
 			return $m[1];
+		if (preg_match("/<meta[^<>]*charset\s*=\s*[\"']?([^<>\"']+)[\"']?[^<>]*>/i",$data,$m))
+			return $m[1];
 		return null;
 	}
 
