@@ -304,7 +304,7 @@ class Req
 		return $cookies;
 	}
 
-	protected function findEncoding($s)
+	public function findEncoding($s)
 	{
 		list($header,$data) = explode("\r\n\r\n",$s,2);
 		if (preg_match("/charset\s*=(\S+)/",$header,$m))
