@@ -3,6 +3,8 @@
 /* 
 	Req class by Kasheftin
 
+		v. 0.16 (2011.05.25)
+			- DEBUG updated. 
 		v. 0.15 (2011.02.04)
 			- Redirect in meta is also supported.
 		v. 0.14 (2010.11.26)
@@ -35,7 +37,8 @@ class Req
 		"content-type" => "application/x-www-form-urlencoded",
 		"port" => "80",
 		"x-requested-with" => false,
-		"debug" => false,
+		"debug" => false,		// false <=> NONE, true <=> ALL, SHORT
+		"debug_class" => "DEBUG",
 		"auto_updatecookies" => true,
 		"auto_redirects" => true,
 		"auto_redirects_limit" => 5,
@@ -57,10 +60,7 @@ class Req
 	{
 		$args = func_get_args();
 
-		if (class_exists("DEBUG") && $this->opts[debug])
-		{
-			DEBUG::log($args,__METHOD__);
-		}
+		$this->log($args);
 
 		if (count($args) == 3)
 			$args = array($args[0]=>array($args[1]=>$args[2]));
@@ -146,25 +146,12 @@ class Req
 				$r .= $v . ": " . $opts[$i] . "\r\n";
 		$r .= "\r\n" . $content;
 
-		if ($opts["debug"])
-		{
-			if (class_exists("DEBUG"))
-			{
-				DEBUG::log(trim($r),__METHOD__);
-			}
-			else
-			{
-				echo "\n\n" . trim($r) . "\n";
-			}
-		}
+		$this->log($opts["protocol"] . " " . $opts["host"] . $opts["url"],"SHORT");
+		$this->log($r);
 
 		if ($opts["delay"])
 		{
-			if (class_exists("DEBUG"))
-				DEBUG::log("Sleeping for a " . ($opts["delay"]==1?"second":$opts["delay"] . " seconds") . " before sending request",__METHOD__);
-			else
-				echo "Sleeping for a " . ($opts["delay"]==1?"second":$opts["delay"] . " seconds") . " before sending request\n";
-
+			$this->log("Sleeping for a " . ($opts["delay"]==1?"second":$opts["delay"] . " seconds") . " before sending request","SHORT");
 			sleep($opts["delay"]);
 		}
 
@@ -248,6 +235,31 @@ class Req
 		$opts = array_pop($this->opts);
 		return $this;
 	}
+	
+
+	protected function log($str,$type = "ALL")
+	{
+		$opts = end($this->opts);
+
+		if ($opts["debug"] == false || $opts["debug"] == "NONE" || ($opts["debug"] == "SHORT" && $type == "ALL")) return $this;
+
+		$trace = debug_backtrace();
+		$caller = array_shift($trace);
+
+		$str = $caller["class"] . ":" . $caller["function"] . " " . trim($str);
+
+		if ($opts["debug_class"] && class_exists($opts["debug_class"]))
+			$opts["debug_class"]::log($str);
+		else
+		{
+			echo $str . "\n";
+			ob_flush();
+			flush();
+		}
+
+		return $this;
+	}
+
 
 	protected function merge_vars_req($vars,$before="",$after="")
 	{
