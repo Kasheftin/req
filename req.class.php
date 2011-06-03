@@ -249,7 +249,7 @@ class Req
 		$str = $caller["class"] . ":" . $caller["function"] . " " . trim($str);
 
 		if ($opts["debug_class"] && class_exists($opts["debug_class"]))
-			$opts["debug_class"]::log($str);
+			call_user_func($opts["debug_class"] . "::log",$str);
 		else
 		{
 			echo $str . "\n";
