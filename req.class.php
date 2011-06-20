@@ -37,7 +37,7 @@ class Req
 		"content-type" => "application/x-www-form-urlencoded",
 		"port" => "80",
 		"x-requested-with" => false,
-		"debug" => false,		// false <=> NONE, true <=> ALL, SHORT
+		"debug" => false,
 		"debug_class" => "DEBUG",
 		"auto_updatecookies" => true,
 		"auto_redirects" => true,
@@ -60,7 +60,7 @@ class Req
 	{
 		$args = func_get_args();
 
-		$this->log($args);
+		$this->log($args,"MINOR");
 
 		if (count($args) == 3)
 			$args = array($args[0]=>array($args[1]=>$args[2]));
@@ -96,6 +96,18 @@ class Req
 
 		$this->opts[] = $opts;
 		return $this;
+	}
+
+	public function getHostAndUrl($str)
+	{
+		if (preg_match("/^http:\/\//",$str))
+		{
+			$ar = explode("/",preg_replace("/^http:\/\//","",$str),2);
+			$opts = array("host"=>$ar[0],"url"=>"/" . $ar[1]);
+		}
+		else
+			$opts = array("url"=>$str);
+		return $opts;
 	}
 
 	public function req($vars = array())
@@ -147,7 +159,7 @@ class Req
 		$r .= "\r\n" . $content;
 
 		$this->log($opts["protocol"] . " " . $opts["host"] . $opts["url"],"SHORT");
-		$this->log($r);
+		$this->log($r,"LONG");
 
 		if ($opts["delay"])
 		{
@@ -200,7 +212,11 @@ class Req
 		{
 			$page_encoding = $this->findEncoding($s);
 			if ($page_encoding && $page_encoding != $opts["auto_encode_to"])
+			{
 				$s = iconv($page_encoding,$opts["auto_encode_to"],$s);
+				$s = preg_replace("/(Content-Type:.*?charset=)" . $page_encoding . "/","\\1" . $opts["auto_encode_to"],$s);
+				$s = preg_replace("/(<meta[^<>]*)" . $page_encoding . "/","\\1" . $opts["auto_encode_to"],$s);
+			}
 		}
 		$var = $s;
 		return $this;
@@ -241,21 +257,17 @@ class Req
 	{
 		$opts = end($this->opts);
 
+		if ($opts["debug_class"] && class_exists($opts["debug_class"]))
+		{
+			$opts["debug_class"]::log($str,$type . "&REQ");
+			return $this;
+		}
+
 		if ($opts["debug"] == false || $opts["debug"] == "NONE" || ($opts["debug"] == "SHORT" && $type == "ALL")) return $this;
 
-		$trace = debug_backtrace();
-		$caller = array_shift($trace);
-
-		$str = $caller["class"] . ":" . $caller["function"] . " " . trim($str);
-
-		if ($opts["debug_class"] && class_exists($opts["debug_class"]))
-			call_user_func($opts["debug_class"] . "::log",$str);
-		else
-		{
-			echo $str . "\n";
-			ob_flush();
-			flush();
-		}
+		echo trim($str) . "\n";
+		ob_flush();
+		flush();
 
 		return $this;
 	}
