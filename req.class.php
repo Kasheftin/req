@@ -183,7 +183,7 @@ class Req
 		{
 			$tmp_cookies = $this->parseCookies($s);
 			if ($tmp_cookies)
-				$this->set("cookies",$tmp_cookies);
+				$this->set("cookies",array_merge($opts["cookies"],$tmp_cookies));
 		}
 
 		if ($opts["auto_redirects"])
