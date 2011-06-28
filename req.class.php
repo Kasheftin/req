@@ -357,9 +357,8 @@ class Req
 			{
 				$opts["url"] = $m[1];
 			}
-			$opts["protocol"] = "GET";
 		}
-		elseif (preg_match("/<meta[^<>]*http-equiv=[\"']?Refresh[\"']?[^<>]*>/",$data,$m))
+		elseif (preg_match("/<meta[^<>]*http-equiv=[\"']?refresh[\"']?[^<>]*>/i",$data,$m))
 		{
 			if (preg_match("/url=([^<>\"']*)/",$m[0],$mm))
 			{
@@ -376,6 +375,7 @@ class Req
 				}
 			}
 		}
+		$opts["protocol"] = "GET";
 		return $opts;
 	}
 }
