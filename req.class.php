@@ -28,7 +28,7 @@ class Req
 	protected $defaults = array(
 		"protocol" => "GET",
 		"accept" => "text/html,application/xhtml+xml,application/xml,image/gif,image/x-xbitmap,image/jpeg,image/pjpeg,application/x-shockwave-flash;q=0.9,*/*;q=0.8",
-		"accept-language" => "ru",
+		"accept-language" => "en",
 		"user-agent" => "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.9.2.12) Gecko/20101026 Firefox/3.6.12",
 		"accept-charset" => "windows-1251,utf-8;q=0.7,*;q=0.7",
 		"cache-control" => "no-cache",
@@ -359,6 +359,7 @@ class Req
 			{
 				$opts["url"] = $m[1];
 			}
+			$opts["protocol"] = "GET";
 		}
 		elseif (preg_match("/<meta[^<>]*http-equiv=[\"']?refresh[\"']?[^<>]*>/i",$data,$m))
 		{
@@ -375,9 +376,9 @@ class Req
 				{
 					$opts["url"] = $mm[1];
 				}
+				$opts["protocol"] = "GET";
 			}
 		}
-		$opts["protocol"] = "GET";
 		return $opts;
 	}
 }
